@@ -34,10 +34,12 @@ after_script:
   - STACK_TIX=$($STACK path --local-hpc-root)/codecov-haskell/test-all/test-all.tix
   - STACK_CABAL_VER=.stack-work/dist/x86_64-linux-tinfo6/Cabal-2.4.0.1/hpc
   - STACK_MIX_DIR=$STACK_CABAL_VER
+  - echo STACK_TIX=$STACK_TIX
+  - echo STACK_MIX_DIR=$STACK_MIX_DIR
   - |
-    stack exec -- codecov-haskell \
+    $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
-      --mix-dir=$STACK_CABAL_VER
+      --mix-dir=$STACK_MIX_DIR
       --display-report
       test-all
 
