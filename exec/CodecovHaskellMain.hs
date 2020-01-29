@@ -24,16 +24,20 @@ getUrlApiV2 :: IO String
 getUrlApiV2 = do
     env <- getEnvironment
     case snd <$> find (isJust . flip lookup env . fst) ciEnvVars of
-        Just (idParamName, idParamEnvVar, commitEnvVar, branchEnvVar) -> do
+        Just (service, idParamEnvVar, commitEnvVar, branchEnvVar) -> do
             idParamValue <- getEnv idParamEnvVar
             commit <- getEnv commitEnvVar
             branch <- getEnv branchEnvVar
-            return $ baseUrlApiV2 ++ "?" ++ idParamName ++ "=" ++ idParamValue ++ "&commit=" ++ commit ++ "&branch=" ++ branch
+            return $ baseUrlApiV2 ++
+                     "?job=" ++ idParamValue ++
+                     "&commit=" ++ commit ++
+                     "&branch=" ++ branch ++
+                     "&service=" ++ service
         _ -> error "Unsupported CI service."
     where ciEnvVars = [
-           ("TRAVIS", ("job", "TRAVIS_JOB_ID", "TRAVIS_COMMIT", "TRAVIS_BRANCH")),
-           ("JENKINS_HOME", ("job", "BUILD_NUMBER", "GIT_COMMIT", "GIT_BRANCH")),
-           ("CIRCLECI", ("job", "CIRCLE_BUILD_NUM", "CIRCLE_SHA1", "CIRCLE_BRANCH"))]
+           ("TRAVIS", ("travis", "TRAVIS_JOB_ID", "TRAVIS_COMMIT", "TRAVIS_BRANCH")),
+           ("JENKINS_HOME", ("jenkins", "BUILD_NUMBER", "GIT_COMMIT", "GIT_BRANCH")),
+           ("CIRCLECI", ("circleci", "CIRCLE_BUILD_NUM", "CIRCLE_SHA1", "CIRCLE_BRANCH"))]
 
 getUrlWithToken :: String -> String -> Maybe String -> IO String
 getUrlWithToken apiUrl _ Nothing = return apiUrl

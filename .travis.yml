@@ -22,8 +22,8 @@ before_install:
   - export PATH="$HOME/.local/bin:$PATH"
   - |
       travis_retry curl \
-      -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | \
-      tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+        -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | \
+        tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
 install:
   - export STACK="stack --resolver=$RESOLVER"
@@ -36,17 +36,18 @@ script:
 
 after_script:
   - echo stack=$STACK
-  - STACK_TIX=$($STACK path --local-hpc-root)/codecov-haskell/test-all/test-all.tix
+  - STACK_HPC_ROOT=$($STACK path --local-hpc-root)
+  - STACK_TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
   - STACK_CABAL_VER=.stack-work/dist/x86_64-linux/Cabal-2.4.0.1/hpc
   - STACK_MIX_DIR=$STACK_CABAL_VER
   - echo STACK_TIX=$STACK_TIX
   - echo STACK_MIX_DIR=$STACK_MIX_DIR
-  - find $STACK_MIX_DIR
+  - CODECOV_TOKEN=f70b7e1b-4baf-41c9-af97-901115b93694
   - |
     $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
       --mix-dir=$STACK_MIX_DIR \
-      --token=f70b7e1b-4baf-41c9-af97-901115b93694 \
+      --token=$CODECOV_TOKEN \
       --display-report \
       test-all
 
@@ -89,7 +90,6 @@ after_script:
 # after_script:
 #   - dist/build/codecov-haskell/codecov-haskell test-all
 # --exclude-dir=test --display-report --print-response
-
 
 # notifications:
 #   webhooks:
