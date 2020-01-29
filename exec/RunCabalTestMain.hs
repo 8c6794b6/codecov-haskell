@@ -19,8 +19,8 @@ isTestFailure line = line =~ "^Test suite .*: FAIL$"
 
 readLines :: Handle -> Handle -> IO [String]
 readLines hIn hOut = do
-    isEOF <- hIsEOF hIn
-    if isEOF
+    eof <- hIsEOF hIn
+    if eof
         then return []
         else do
             x <- hGetLine hIn

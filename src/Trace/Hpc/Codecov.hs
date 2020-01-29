@@ -12,11 +12,12 @@
 module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
 import           Data.Aeson
-import           Data.Aeson.Types ()
+import           Data.Aeson.Types         ()
 import           Data.Function
 import           Data.List
-import qualified Data.Map.Strict as M
-import           System.Exit (exitFailure)
+import qualified Data.Map.Strict          as M
+import           System.Exit              (exitFailure)
+import           System.FilePath          ((</>))
 import           Trace.Hpc.Codecov.Config
 import           Trace.Hpc.Codecov.Lix
 import           Trace.Hpc.Codecov.Paths
@@ -61,7 +62,7 @@ getExprSource source (hpcPos, _) = subSubSeq startCol endCol subLines
 groupMixEntryTixs :: [(MixEntry, Integer, [String])] -> [CoverageEntry]
 groupMixEntryTixs = map mergeOnLst3 . groupBy ((==) `on` fst . fst3)
     where mergeOnLst3 xxs@(x : _) = (map fst3 xxs, map snd3 xxs, trd3 x)
-          mergeOnLst3 [] = error "mergeOnLst3 appliedTo empty list"
+          mergeOnLst3 []          = error "mergeOnLst3 appliedTo empty list"
 
 -- TODO possible renaming to "getModuleCoverage"
 coverageToJson :: LixConverter -> ModuleCoverageData -> SimpleCoverage
@@ -86,21 +87,24 @@ mergeCoverageData :: [TestSuiteCoverageData] -> TestSuiteCoverageData
 mergeCoverageData = foldr1 (M.unionWith mergeModuleCoverageData)
 
 readMix' :: Config -> String -> TixModule -> IO Mix
-readMix' config name tix = readMix (getMixPaths config name tix) $ Right tix
+-- readMix' config name tix = readMix (getMixPaths config name tix) $ Right tix
+readMix' config _name tix = readMix [mixDir config] (Right tix)
 
 -- | Create a list of coverage data from the tix input
-readCoverageData :: Config                   -- ^ codecov-haskell configuration 
+readCoverageData :: Config                   -- ^ codecov-haskell configuration
                  -> String                   -- ^ test suite name
                  -> [String]                 -- ^ excluded source folders
                  -> IO TestSuiteCoverageData -- ^ coverage data list
 readCoverageData config testSuiteName excludeDirPatterns = do
-    tixPath <- getTixPath config testSuiteName
+    -- let tixPath = getTixPath config testSuiteName
+    let tixPath = tixDir config
     mtix <- readTix tixPath
     case mtix of
         Nothing -> error ("Couldn't find the file " ++ tixPath) >> exitFailure
         Just (Tix tixs) -> do
             mixs <- mapM (readMix' config testSuiteName) tixs
-            let files = map filePath mixs
+            let files = map ((srcDir config </>) . filePath) mixs
+            -- sources <- mapM (readFile . (srcDir config </>)) files
             sources <- mapM readFile files
             let coverageDataList = zip4 files sources mixs (map tixModuleTixs tixs)
             let filteredCoverageDataList = filter sourceDirFilter coverageDataList

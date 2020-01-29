@@ -9,8 +9,8 @@
 
 module Trace.Hpc.Codecov.Paths where
 
-import Trace.Hpc.Tix
-import Trace.Hpc.Codecov.Config 
+import           Trace.Hpc.Codecov.Config
+import           Trace.Hpc.Tix
 
 defaultHpcDir :: FilePath
 defaultHpcDir = "dist/hpc/"
@@ -27,7 +27,8 @@ getMixPaths config testSuiteName tix = do _dirName <- dirName
     where dirName = case span (/= '/') modName of
               (_, [])        -> [ testSuiteName ]
               (packageId, _) -> [ "", packageId ]
-          TixModule modName _ _ _ = tix
+          modName = tixModuleName tix
 
-getTixPath :: Config -> String -> IO FilePath
-getTixPath config testSuiteName = return $ tixDir config ++ testSuiteName ++ "/" ++ getTixFileName testSuiteName
+getTixPath :: Config -> String -> FilePath
+getTixPath config testSuiteName =
+  tixDir config ++ testSuiteName ++ "/" ++ getTixFileName testSuiteName
