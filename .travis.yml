@@ -46,6 +46,7 @@ after_script:
     $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
       --mix-dir=$STACK_MIX_DIR \
+      --token=f70b7e1b-4baf-41c9-af97-901115b93694 \
       --display-report \
       test-all
 
