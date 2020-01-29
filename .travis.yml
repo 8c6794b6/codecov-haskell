@@ -39,8 +39,8 @@ after_script:
   - |
     $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
-      --mix-dir=$STACK_MIX_DIR
-      --display-report
+      --mix-dir=$STACK_MIX_DIR \
+      --display-report \
       test-all
 
 # env:
