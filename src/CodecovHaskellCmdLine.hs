@@ -13,7 +13,7 @@ data CodecovHaskellArgs = CmdMain
     , accessToken   :: Maybe String
     , excludeDirs   :: [String]
     , testSuites    :: [String]
-    , tixDir        :: FilePath
+    , tixFile       :: FilePath
     , mixDir        :: FilePath
     , srcDir        :: FilePath
     , displayReport :: Bool
@@ -41,18 +41,18 @@ codecovHaskellArgs = CmdMain
         &= typDir
         &= name "exclude-dir"
         &= help "Exclude sources files under the matching directory from the coverage report"
-    , tixDir        =
+    , tixFile        =
         defaultTixDir
         &= explicit
-        &= typDir
-        &= name "tix-dir"
-        &= help "Exclude sources files under the matching directory from the coverage report"
+        &= typFile
+        &= name "tix"
+        &= help "Path to the .tix file"
     , mixDir        =
         defaultMixDir
         &= explicit
         &= typDir
         &= name "mix-dir"
-        &= help "Exclude sources files under the matching directory from the coverage report"
+        &= help "Path to the directory containing \".mix\" files"
     , srcDir =
         "."
         &= explicit
