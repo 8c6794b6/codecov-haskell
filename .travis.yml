@@ -8,6 +8,11 @@ cache:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
 
+addons:
+  apt:
+    packages:
+      - curl
+
 env:
   jobs:
     - EXEC="stack" RESOLVER="lts-14"
