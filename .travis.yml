@@ -36,7 +36,7 @@ after_script:
   - STACK_MIX_DIR=$STACK_CABAL_VER
   - |
     stack exec -- codecov-haskell \
-      --tix-dir=$STACK_TIX \
+      --tix=$STACK_TIX \
       --mix-dir=$STACK_CABAL_VER
       --display-report
       test-all
