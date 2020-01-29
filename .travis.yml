@@ -36,6 +36,7 @@ after_script:
   - STACK_MIX_DIR=$STACK_CABAL_VER
   - echo STACK_TIX=$STACK_TIX
   - echo STACK_MIX_DIR=$STACK_MIX_DIR
+  - find $STACK_MIX_DIR
   - |
     $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
