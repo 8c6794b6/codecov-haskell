@@ -20,7 +20,6 @@ import           System.Exit              (exitFailure)
 import           System.FilePath          ((</>))
 import           Trace.Hpc.Codecov.Config
 import           Trace.Hpc.Codecov.Lix
-import           Trace.Hpc.Codecov.Paths
 import           Trace.Hpc.Codecov.Types
 import           Trace.Hpc.Codecov.Util
 import           Trace.Hpc.Mix
@@ -35,7 +34,8 @@ type ModuleCoverageData = (
 type TestSuiteCoverageData = M.Map FilePath ModuleCoverageData
 
 -- single file coverage data in the format defined by codecov.io
-type SimpleCoverage = [CoverageValue]
+-- type SimpleCoverage = [CoverageValue]
+type SimpleCoverage = M.Map Int CoverageValue
 
 -- Is there a way to restrict this to only Number and Null?
 type CoverageValue = Value
@@ -43,14 +43,26 @@ type CoverageValue = Value
 type LixConverter = Lix -> SimpleCoverage
 
 defaultConverter :: LixConverter
-defaultConverter = map $ \lix -> case lix of
-    Full       -> Number 1
-    Partial    -> Bool True
-    None       -> Number 0
-    Irrelevant -> Null
+-- defaultConverter = map $ \lix -> case lix of
+--     Full       -> Number 1
+--     Partial    -> Bool True
+--     None       -> Number 0
+--     Irrelevant -> Null
+defaultConverter = M.fromList . snd . foldl' f (1, [])
+  where
+    f :: (Int, [(Int,Value)]) -> Hit -> (Int, [(Int, Value)])
+    f (line_count, acc) hit =
+      -- XXX: Partial hit is always showing "1/2".
+      let line_count' = line_count + 1
+      in  case hit of
+            Full       -> (line_count', (line_count, Number 1) : acc)
+            Partial    -> (line_count', (line_count, String "1/2") : acc)
+            None       -> (line_count', (line_count, Number 0) : acc)
+            Irrelevant -> (line_count', acc)
 
 toSimpleCoverage :: LixConverter -> Int -> [CoverageEntry] -> SimpleCoverage
-toSimpleCoverage convert lineCount = (:) Null . convert . toLix lineCount
+-- toSimpleCoverage convert lineCount = (:) Null . convert . toLix lineCount
+toSimpleCoverage convert lineCount = convert . toLix lineCount
 
 getExprSource :: [String] -> MixEntry -> [String]
 getExprSource source (hpcPos, _) = subSubSeq startCol endCol subLines
@@ -100,14 +112,17 @@ readCoverageData config testSuiteName excludeDirPatterns = do
     let tixPath = tixDir config
     mtix <- readTix tixPath
     case mtix of
-        Nothing -> error ("Couldn't find the file " ++ tixPath) >> exitFailure
+        Nothing -> do putStrLn ("Couldn't find the file " ++ tixPath)
+                      exitFailure
         Just (Tix tixs) -> do
             mixs <- mapM (readMix' config testSuiteName) tixs
             let files = map ((srcDir config </>) . filePath) mixs
             -- sources <- mapM (readFile . (srcDir config </>)) files
             sources <- mapM readFile files
-            let coverageDataList = zip4 files sources mixs (map tixModuleTixs tixs)
-            let filteredCoverageDataList = filter sourceDirFilter coverageDataList
+            let coverageDataList =
+                  zip4 files sources mixs (map tixModuleTixs tixs)
+            let filteredCoverageDataList =
+                  filter sourceDirFilter coverageDataList
             return $ M.fromList $ map toFirstAndRest filteredCoverageDataList
             where filePath (Mix fp _ _ _ _) = fp
                   sourceDirFilter = not . matchAny excludeDirPatterns . fst4
@@ -116,7 +131,9 @@ readCoverageData config testSuiteName excludeDirPatterns = do
 generateCodecovFromTix :: Config   -- ^ codecov-haskell configuration
                        -> IO Value -- ^ code coverage result in json format
 generateCodecovFromTix config = do
-    testSuitesCoverages <- mapM (flip (readCoverageData config) excludedDirPatterns) testSuiteNames
+    testSuitesCoverages <- mapM (flip (readCoverageData config)
+                                      excludedDirPatterns)
+                                testSuiteNames
     return $ toCodecovJson converter $ mergeCoverageData testSuitesCoverages
     where excludedDirPatterns = excludedDirs config
           testSuiteNames = testSuites config
