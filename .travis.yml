@@ -17,7 +17,7 @@ cache:
 #   jobs:
 #     - EXEC="stack" RESOLVER="lts-14"
 
-matrix:
+jobs:
   include:
     - env: EXEC="stack" RESOLVER="lts-14"
     - env: EXEC="cabal" GHCVER="8.8.2"
@@ -102,7 +102,8 @@ after_script:
       cabal)
         GHCVER_DIR=dist-newstyle/build/x86_64-linux/ghc-$GHCVER/
         CCV_HS_VER=$(cabal v2-exec -- codecov-haskell --numeric-version)
-        VANILLA=$GHCVER_DIR/codecov-haskell-$CCV_HS_VER/hpc/vanilla
+        CCV_HS=codecov-haskell-$CCV_HS_VER
+        VANILLA=$GHCVER_DIR/$CCV_HS/hpc/vanilla
         TIX=$VANILLA/tix/$CCV_HS/$CCV_HS.tix
         MIX_DIR=$VANILLA/mix/$CCV_HS
         cabal v2-exec -- codecov-haskell \
