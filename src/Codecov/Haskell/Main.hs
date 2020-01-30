@@ -1,4 +1,4 @@
-module Main where
+module Codecov.Haskell.Main (defaultMain) where
 
 import           Control.Concurrent
 import           Control.Monad
@@ -11,12 +11,12 @@ import           System.Console.CmdArgs
 import           System.Environment         (getEnv, getEnvironment)
 import           System.Exit                (exitFailure, exitSuccess)
 import           Trace.Hpc.Codecov
-import           Trace.Hpc.Codecov.Config   (Config (Config))
-import qualified Trace.Hpc.Codecov.Config   as Config
 import           Trace.Hpc.Codecov.Curl
+import           Trace.Hpc.Codecov.Types    (Config (Config))
+import qualified Trace.Hpc.Codecov.Types    as Config
 import           Trace.Hpc.Codecov.Util
 
-import           CodecovHaskellCmdLine
+import           Codecov.Haskell.CmdLine
 
 class QueryParam q where
   qp_service   :: q -> String
@@ -142,8 +142,8 @@ getConfig cha =
                    , Config.srcDir       = srcDir cha
                    }
 
-main :: IO ()
-main = do
+defaultMain :: IO ()
+defaultMain = do
     cha <- cmdArgs codecovHaskellArgs
     case getConfig cha of
         Nothing -> do

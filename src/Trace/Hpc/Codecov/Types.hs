@@ -29,3 +29,12 @@ type Lix = [Hit]
 data PostResult =
     PostSuccess URLString URLString -- ^ Codecov job url and wait url
   | PostFailure String              -- ^ error message
+
+-- | Configuration to find tix, mix and source code files.
+data Config = Config {
+    excludedDirs :: ![FilePath],
+    testSuites   :: ![String],
+    tixDir       :: !FilePath,
+    mixDir       :: !FilePath,
+    srcDir       :: !FilePath
+    }

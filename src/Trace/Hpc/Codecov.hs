@@ -12,13 +12,12 @@
 module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
 import           Data.Aeson
-import           Data.Aeson.Types         ()
+import           Data.Aeson.Types        ()
 import           Data.Function
 import           Data.List
-import qualified Data.Map.Strict          as M
-import           System.Exit              (exitFailure)
-import           System.FilePath          ((</>))
-import           Trace.Hpc.Codecov.Config
+import qualified Data.Map.Strict         as M
+import           System.Exit             (exitFailure)
+import           System.FilePath         ((</>))
 import           Trace.Hpc.Codecov.Lix
 import           Trace.Hpc.Codecov.Types
 import           Trace.Hpc.Codecov.Util
@@ -103,7 +102,8 @@ readMix' :: Config -> String -> TixModule -> IO Mix
 readMix' config _name tix = readMix [mixDir config] (Right tix)
 
 -- | Create a list of coverage data from the tix input
-readCoverageData :: Config                   -- ^ codecov-haskell configuration
+readCoverageData :: Config                   -- ^ codecov-haskell
+                                             -- configuration
                  -> String                   -- ^ test suite name
                  -> [String]                 -- ^ excluded source folders
                  -> IO TestSuiteCoverageData -- ^ coverage data list
@@ -112,8 +112,12 @@ readCoverageData config testSuiteName excludeDirPatterns = do
     let tixPath = tixDir config
     mtix <- readTix tixPath
     case mtix of
-        Nothing -> do putStrLn ("Couldn't find the file " ++ tixPath)
-                      exitFailure
+        Nothing
+          | null tixPath -> do putStrLn ("No tix file specified.")
+                               exitFailure
+          | otherwise  -> do putStrLn ("Couldn't find the tix file \"" ++
+                                       tixPath ++ "\"")
+                             exitFailure
         Just (Tix tixs) -> do
             mixs <- mapM (readMix' config testSuiteName) tixs
             let files = map ((srcDir config </>) . filePath) mixs

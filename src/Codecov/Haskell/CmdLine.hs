@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
-module CodecovHaskellCmdLine where
+module Codecov.Haskell.CmdLine where
 
 import Data.List
 import Data.Version            (Version (..))
