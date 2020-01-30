@@ -22,24 +22,30 @@ baseUrlApiV2 :: String
 baseUrlApiV2 = "https://codecov.io/upload/v2"
 
 class QueryParam q where
-  qp_service :: q -> String
-  qp_service = const "unknown"
-  qp_branch  :: q -> IO String
-  qp_branch  = const (return "")
-  qp_build   :: q -> IO String
-  qp_build   = const (return "")
-  qp_commit  :: q -> IO String
-  qp_commit  = const (return "")
-  qp_job     :: q -> IO String
-  qp_job     = const (return "")
-  qp_slug    :: q -> IO String
-  qp_slug    = const (return "")
-  qp_env     :: q -> IO String
-  qp_env     = const (return "")
-  qp_tag     :: q -> IO String
-  qp_tag     = const (return "")
-  qp_pr      :: q -> IO String
-  qp_pr      = const (return "")
+  qp_service   :: q -> String
+  qp_service   = const "unknown"
+  qp_branch    :: q -> IO String
+  qp_branch    = const (return "")
+  qp_build     :: q -> IO String
+  qp_build     = const (return "")
+  qp_build_url :: q -> IO String
+  qp_build_url = const (return "")
+  qp_commit    :: q -> IO String
+  qp_commit    = const (return "")
+  qp_flags     :: q -> IO String
+  qp_flags     = const (return "")
+  qp_job       :: q -> IO String
+  qp_job       = const (return "")
+  qp_name      :: q -> IO String
+  qp_name      = const (return "")
+  qp_slug      :: q -> IO String
+  qp_slug      = const (return "")
+  qp_env       :: q -> IO String
+  qp_env       = const (return "")
+  qp_tag       :: q -> IO String
+  qp_tag       = const (return "")
+  qp_pr        :: q -> IO String
+  qp_pr        = const (return "")
 
 data Travis = Travis
 
@@ -65,18 +71,21 @@ instance QueryParam Jenkins
 composeParam :: QueryParam ci => ci -> IO String
 composeParam ci =
   do let service = qp_service ci
-         get_val acc (g,key,format) = do
+         get_val acc (key,g,format) = do
            val <- g ci
            return ((key ++ '=':format val) : acc)
-         kvs = [(qp_branch, "branch", id)
-               ,(qp_build, "build", id)
-               ,(qp_commit, "commit", id)
-               ,(qp_job, "job", id)
-               ,(qp_slug, "slug", url_encode)
-               ,(qp_env, "env", id)
-               ,(qp_tag, "tag", id)
-               ,(qp_pr, "pr", drop_head_sharps)]
-         url_encode = escapeURIString isUnescapedInURIComponent
+         kvs = [("branch", qp_branch, id)
+               ,("build", qp_build, id)
+               ,("build_url", qp_build_url,  id)
+               ,("commit", qp_commit, id)
+               ,("flags", qp_flags, id)
+               ,("name", qp_name, urlencode)
+               ,("job", qp_job, id)
+               ,("slug", qp_slug, urlencode)
+               ,("env", qp_env, id)
+               ,("tag", qp_tag, id)
+               ,("pr", qp_pr, drop_head_sharps)]
+         urlencode = escapeURIString isUnescapedInURIComponent
          drop_head_sharps = dropWhile (== '#')
 
      params <- foldM get_val [("service" ++ '=':service)] kvs
