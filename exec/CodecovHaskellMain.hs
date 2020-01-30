@@ -126,7 +126,7 @@ getUrlWithToken :: String -> String -> Maybe String -> String
 -- getUrlWithToken apiUrl _ Nothing = return apiUrl
 -- getUrlWithToken apiUrl param (Just t) = return $ apiUrl ++ "&" ++ param ++ "=" ++ t
 getUrlWithToken apiUrl param mb_val =
-  apiUrl ++ '$':param ++ '=':fromMaybe "" mb_val
+  apiUrl ++ '&':param ++ '=':fromMaybe "" mb_val
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
 getConfig cha = do _testSuites <- listToMaybe (testSuites cha)
