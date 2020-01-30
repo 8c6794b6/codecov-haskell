@@ -100,12 +100,10 @@ after_script:
           test-all
         ;;
       cabal)
-        # find ./dist-newstyle -name '*.tix'
-        # find ./dist-newstyle -name '*.mix'
+        GHCVER_DIR=dist-newstyle/build/x86_64-linux/ghc-$GHCVER/
         CCV_HS_VER=$(cabal v2-exec -- codecov-haskell --numeric-version)
-        CCV_HS=codecov-haskell-$CCV_HS_VER
-        VANILLA=dist-newstyle/build/x86_64-linux/ghc-$GHCVER/$CCV_HS/hpc/vanilla
-        TIX=$VANILLA/tix/$CCV_HS.tix
+        VANILLA=$GHCVER_DIR/codecov-haskell-$CCV_HS_VER/hpc/vanilla
+        TIX=$VANILLA/tix/$CCV_HS/$CCV_HS.tix
         MIX_DIR=$VANILLA/mix/$CCV_HS
         cabal v2-exec -- codecov-haskell \
           --tix=$TIX \
