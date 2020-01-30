@@ -89,20 +89,29 @@ after_script:
         echo stack=$STACK
         STACK_HPC_ROOT=$($STACK path --local-hpc-root)
         STACK_DIST_DIR=$($STACK path --dist-dir)
-        STACK_TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
-        STACK_MIX_DIR=$STACK_DIST_DIR/hpc
-        echo STACK_TIX=$STACK_TIX
-        echo STACK_MIX_DIR=$STACK_MIX_DIR
+        TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
+        MIX_DIR=$STACK_DIST_DIR/hpc
+        echo TIX=$TIX
+        echo MIX_DIR=$MIX_DIR
         $STACK exec -- codecov-haskell \
-          --tix=$STACK_TIX \
-          --mix-dir=$STACK_MIX_DIR \
+          --tix=$TIX \
+          --mix-dir=$MIX_DIR \
           --display-report \
           test-all
         ;;
       cabal)
-        find ./dist-newstyle -name '*.tix'
-        find ./dist-newstyle -name '*.mix'
-        cabal v2-exec -- codecov-haskell --numeric-version
+        # find ./dist-newstyle -name '*.tix'
+        # find ./dist-newstyle -name '*.mix'
+        CCV_HS_VER=$(cabal v2-exec -- codecov-haskell --numeric-version)
+        CCV_HS=codecov-haskell-$CCV_HS_VER
+        VANILLA=dist-newstyle/build/x86_64-linux/ghc-$GHCVER/$CCV_HS/hpc/vanilla
+        TIX=$VANILLA/tix/$CCV_HS.tix
+        MIX_DIR=$VANILLA/mix/$CCV_HS
+        cabal v2-exec -- codecov-haskell \
+          --tix=$TIX \
+          --mix-dir=$MIX_DIR \
+          --display-report \
+          test-all
     esac
 
   # - echo stack=$STACK
