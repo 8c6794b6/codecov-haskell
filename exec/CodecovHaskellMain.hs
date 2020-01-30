@@ -75,10 +75,9 @@ composeParam ci =
                ,(qp_slug, "slug", url_encode)
                ,(qp_env, "env", id)
                ,(qp_tag, "tag", id)
-               ,(qp_pr, "pr", drop_head_sharp)]
+               ,(qp_pr, "pr", drop_head_sharps)]
          url_encode = escapeURIString isUnescapedInURIComponent
-         drop_head_sharp ('#':xs) = xs
-         drop_head_sharp xs       = xs
+         drop_head_sharps = dropWhile (== '#')
 
      params <- foldM get_val [("service" ++ '=':service)] kvs
      return $ concat (intersperse "&" params)
@@ -139,6 +138,7 @@ main = do
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV2
+                putStrLn ("API URL: " ++ apiUrl)
                 let fullUrl = getUrlWithToken apiUrl "token" (token cha)
                 response <- postJson (BSL.unpack $ encode codecovJson) fullUrl (printResponse cha)
                 case response of
