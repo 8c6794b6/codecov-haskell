@@ -20,7 +20,7 @@ cache:
 matrix:
   include:
     - env: EXEC="stack" RESOLVER="lts-14"
-    - env: EXEC="cabal"
+    - env: EXEC="cabal" GHCVER="8.8.2"
       addons:
         apt:
           packages:
@@ -39,6 +39,8 @@ before_install:
            -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | \
           tar xz --wildcards --strip-components=1 -C ~/.local/bin
           '*/stack'
+       cabal)
+         export PATH=/opt/ghc/bin:$PATH
        ;;
      esac
 
