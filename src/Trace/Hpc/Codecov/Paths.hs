@@ -9,7 +9,7 @@
 
 module Trace.Hpc.Codecov.Paths where
 
-import Trace.Hpc.Codecov.Types
+import Trace.Hpc.Codecov.Config
 import Trace.Hpc.Tix
 
 defaultHpcDir :: FilePath

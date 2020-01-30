@@ -10,11 +10,11 @@ import           Network.Curl               (URLString)
 import           Network.URI
 import           System.Console.CmdArgs
 import           System.Environment         (getEnv, getEnvironment)
-import           System.Exit                (exitFailure, exitSuccess)
+import           System.Exit                (exitFailure)
 import           Trace.Hpc.Codecov
+import           Trace.Hpc.Codecov.Config   (Config (Config))
+import qualified Trace.Hpc.Codecov.Config   as Config
 import           Trace.Hpc.Codecov.Curl
-import           Trace.Hpc.Codecov.Types    (Config (Config))
-import qualified Trace.Hpc.Codecov.Types    as Config
 import           Trace.Hpc.Codecov.Util
 
 import           Codecov.Haskell.CmdLine
@@ -158,9 +158,7 @@ defaultMain :: IO ()
 defaultMain = do
     cha <- cmdArgs codecovHaskellArgs
     case getConfig cha of
-        Nothing -> do
-            putStrLn "Please specify a target test suite name"
-            exitSuccess
+        Nothing -> putStrLn "Please specify a target test suite name"
         Just config -> do
             codecovJson <- generateCodecovFromTix config
             when (displayReport cha) $

@@ -5,7 +5,6 @@ module TestCodecovHaskellLix where
 
 import Test.HUnit
 import Trace.Hpc.Codecov.Lix
-import Trace.Hpc.Codecov.Types
 
 testToHit = "toHit" ~: [
     Irrelevant @=? toHit [],

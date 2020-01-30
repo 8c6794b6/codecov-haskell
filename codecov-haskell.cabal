@@ -46,8 +46,8 @@ library
     Codecov.Haskell.CmdLine
     Codecov.Haskell.Main
     Trace.Hpc.Codecov
+    Trace.Hpc.Codecov.Config
     Trace.Hpc.Codecov.Lix
-    Trace.Hpc.Codecov.Types
     Trace.Hpc.Codecov.Util
     Paths_codecov_haskell
   other-modules:

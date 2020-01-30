@@ -12,11 +12,24 @@ module Trace.Hpc.Codecov.Lix where
 
 import Data.List
 import Data.Ord
-import Prelude hiding (getLine)
-import Trace.Hpc.Codecov.Types
+import Prelude                hiding (getLine)
 import Trace.Hpc.Codecov.Util
 import Trace.Hpc.Mix
 import Trace.Hpc.Util
+
+type CoverageEntry = (
+    [MixEntry], -- mix entries
+    [Integer],  -- tix values
+    [String])   -- entry source code
+
+data Hit = Full
+         | Partial
+         | None
+         | Irrelevant
+    deriving (Eq, Show)
+
+type Lix = [Hit]
+
 
 toHit :: [Bool] -> Hit
 toHit []  = Irrelevant

@@ -21,7 +21,11 @@ import qualified Data.ByteString.Lazy.Char8 as LBS
 import           Data.Maybe
 import           Data.Monoid
 import           Network.Curl
-import           Trace.Hpc.Codecov.Types
+
+-- | Result to the POST request to codecov.io
+data PostResult =
+    PostSuccess URLString URLString -- ^ Codecov job url and wait url
+  | PostFailure String              -- ^ error message
 
 parseResponse :: CurlResponse -> PostResult
 parseResponse r = case respCurlCode r of

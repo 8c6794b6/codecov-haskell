@@ -12,14 +12,14 @@
 module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
 import           Data.Aeson
-import           Data.Aeson.Types        ()
+import           Data.Aeson.Types         ()
 import           Data.Function
 import           Data.List
-import qualified Data.Map.Strict         as M
-import           System.Exit             (exitFailure)
-import           System.FilePath         ((</>))
+import qualified Data.Map.Strict          as M
+import           System.Exit              (exitFailure)
+import           System.FilePath          ((</>))
+import           Trace.Hpc.Codecov.Config
 import           Trace.Hpc.Codecov.Lix
-import           Trace.Hpc.Codecov.Types
 import           Trace.Hpc.Codecov.Util
 import           Trace.Hpc.Mix
 import           Trace.Hpc.Tix
