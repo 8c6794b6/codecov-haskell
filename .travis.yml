@@ -48,6 +48,7 @@ after_script:
         --tix=$STACK_TIX \
         --mix-dir=$STACK_MIX_DIR \
         --display-report \
+        --name travis \
         test-all
 
 # env:

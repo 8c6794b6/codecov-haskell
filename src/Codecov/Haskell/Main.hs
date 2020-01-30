@@ -164,8 +164,9 @@ defaultMain = do
             when (displayReport cha) $
               BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
-                apiUrl <- getUrlApiV2
-                let fullUrl = getUrlWithToken apiUrl "token" (token cha)
+                apiUrl0 <- getUrlApiV2
+                let apiUrl1 = getUrlWithToken apiUrl0 "name" (mb_name cha)
+                    fullUrl = getUrlWithToken apiUrl1 "token" (token cha)
                 response <- postJson (BSL.unpack $ encode codecovJson)
                                      fullUrl (printResponse cha)
                 case response of

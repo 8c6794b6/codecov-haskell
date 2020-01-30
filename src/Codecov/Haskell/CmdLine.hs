@@ -11,6 +11,7 @@ import Trace.Hpc.Codecov.Config (defaultMixDir, defaultTixDir)
 data CodecovHaskellArgs = CmdMain
     { token         :: Maybe String
     , accessToken   :: Maybe String
+    , mb_name       :: Maybe String
     , excludeDirs   :: [String]
     , testSuites    :: [String]
     , tixFile       :: FilePath
@@ -35,6 +36,12 @@ codecovHaskellArgs = CmdMain
         &= typ "TXT"
         &= name "access-token"
         &= help "Codecov access token to retrieve reports for private repos"
+    , mb_name =
+        Nothing
+        &= explicit
+        &= typ "TXT"
+        &= name "name"
+        &= help "Name label of coverage report"
     , excludeDirs   =
         []
         &= explicit
