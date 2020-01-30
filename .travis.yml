@@ -38,6 +38,7 @@ before_install:
          travis_retry curl \
            -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | \
           tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+       ;;
        cabal)
          export PATH=/opt/ghc/bin:$PATH
        ;;
@@ -57,6 +58,7 @@ install:
         cabal --version
         ghc --version
         travis_retry cabal v2-update
+        ;;
     esac
 
   # - export STACK="stack --resolver=$RESOLVER"
