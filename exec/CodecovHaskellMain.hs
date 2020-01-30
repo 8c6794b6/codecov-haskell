@@ -70,7 +70,8 @@ instance QueryParam Jenkins
 
 composeParam :: QueryParam ci => ci -> IO String
 composeParam ci =
-  do let service = qp_service ci
+  do let urlencode = escapeURIString isUnescapedInURIComponent
+         drop_head_sharps = dropWhile (== '#')
          get_val acc (key,g,format) = do
            val <- g ci
            return ((key ++ '=':format val) : acc)
@@ -85,10 +86,8 @@ composeParam ci =
                ,("env", qp_env, id)
                ,("tag", qp_tag, id)
                ,("pr", qp_pr, drop_head_sharps)]
-         urlencode = escapeURIString isUnescapedInURIComponent
-         drop_head_sharps = dropWhile (== '#')
-
-     params <- foldM get_val [("service" ++ '=':service)] kvs
+         z = [("service" ++ '=':qp_service ci)]
+     params <- foldM get_val z kvs
      return $ concat (intersperse "&" params)
 
 getUrlApiV2 :: IO String
@@ -123,10 +122,10 @@ getUrlApiV2 =
 --            ("CIRCLECI", ("circleci", "CIRCLE_BUILD_NUM", "CIRCLE_SHA1", "CIRCLE_BRANCH"))]
 
 getUrlWithToken :: String -> String -> Maybe String -> String
--- getUrlWithToken apiUrl _ Nothing = return apiUrl
--- getUrlWithToken apiUrl param (Just t) = return $ apiUrl ++ "&" ++ param ++ "=" ++ t
-getUrlWithToken apiUrl param mb_val =
-  apiUrl ++ '&':param ++ '=':fromMaybe "" mb_val
+getUrlWithToken apiUrl _ Nothing = apiUrl
+getUrlWithToken apiUrl param (Just t) = apiUrl ++ "&" ++ param ++ "=" ++ t
+-- getUrlWithToken apiUrl param mb_val =
+--   apiUrl ++ '&':param ++ '=':fromMaybe "" mb_val
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
 getConfig cha = do _testSuites <- listToMaybe (testSuites cha)
