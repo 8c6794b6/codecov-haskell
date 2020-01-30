@@ -37,17 +37,18 @@ script:
 after_script:
   - echo stack=$STACK
   - STACK_HPC_ROOT=$($STACK path --local-hpc-root)
+  - STACK_DIST_DIR=$($STACK path --dist-dir)
   - STACK_TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
-  - STACK_CABAL_VER=.stack-work/dist/x86_64-linux/Cabal-2.4.0.1/hpc
-  - STACK_MIX_DIR=$STACK_CABAL_VER
+  - STACK_MIX_DIR=$STACK_DIST_DIR/hpc
   - echo STACK_TIX=$STACK_TIX
   - echo STACK_MIX_DIR=$STACK_MIX_DIR
   - |
-    $STACK exec -- codecov-haskell \
-      --tix=$STACK_TIX \
-      --mix-dir=$STACK_MIX_DIR \
-      --display-report \
-      test-all
+    $STACK exec -- \
+      codecov-haskell \
+        --tix=$STACK_TIX \
+        --mix-dir=$STACK_MIX_DIR \
+        --display-report \
+        test-all
 
 # env:
 #   - GHCVER=7.6.3
