@@ -13,11 +13,11 @@ import Trace.Hpc.Tix
 
 -- | Configuration to find tix, mix and source code files.
 data Config = Config {
-    excludedDirs :: ![FilePath],
-    testSuites   :: ![String],
-    tixDir       :: !FilePath,
-    mixDir       :: !FilePath,
-    srcDir       :: !FilePath
+    excludedDirs :: [FilePath],
+    testSuites   :: [String],
+    tixDir       :: FilePath,
+    mixDirs      :: [FilePath],
+    srcDirs      :: [FilePath]
     }
 
 defaultHpcDir :: FilePath
@@ -31,7 +31,8 @@ defaultMixDir = defaultHpcDir ++ "mix/"
 
 getMixPaths :: Config -> String -> TixModule -> [FilePath]
 getMixPaths config testSuiteName tix = do _dirName <- dirName
-                                          return $ mixDir config ++ _dirName ++ "/"
+                                          mixdir <- mixDirs config
+                                          return $ mixdir ++ _dirName ++ "/"
     where dirName = case span (/= '/') modName of
               (_, [])        -> [ testSuiteName ]
               (packageId, _) -> [ "", packageId ]

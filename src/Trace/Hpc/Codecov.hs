@@ -11,6 +11,7 @@
 
 module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
+import           Control.Exception
 import           Data.Aeson
 import           Data.Aeson.Types         ()
 import           Data.Function
@@ -99,7 +100,19 @@ mergeCoverageData = foldr1 (M.unionWith mergeModuleCoverageData)
 
 readMix' :: Config -> String -> TixModule -> IO Mix
 -- readMix' config name tix = readMix (getMixPaths config name tix) $ Right tix
-readMix' config _name tix = readMix [mixDir config] (Right tix)
+readMix' config _name tix = readMix (mixDirs config) (Right tix)
+
+-- | Read given file under 'srcDirs' of 'Config'.
+readFileWithConfig :: Config -> FilePath -> IO String
+readFileWithConfig config path = go [] (srcDirs config)
+  where
+    go acc (dir:dirs) =
+      let path' = dir </> path
+      in  readFile path' `catchIO` const (go (path' : acc) dirs)
+    go acc []         =
+      do putStrLn ("Couldn't find file " ++ path ++ ", searched for:")
+         putStr (unlines (map ("  - " ++) acc))
+         exitFailure
 
 -- | Create a list of coverage data from the tix input
 readCoverageData :: Config                   -- ^ codecov-haskell
@@ -120,9 +133,8 @@ readCoverageData config testSuiteName excludeDirPatterns = do
                              exitFailure
         Just (Tix tixs) -> do
             mixs <- mapM (readMix' config testSuiteName) tixs
-            let files = map ((srcDir config </>) . filePath) mixs
-            -- sources <- mapM (readFile . (srcDir config </>)) files
-            sources <- mapM readFile files
+            let files = map filePath mixs
+            sources <- mapM (readFileWithConfig config) files
             let coverageDataList =
                   zip4 files sources mixs (map tixModuleTixs tixs)
             let filteredCoverageDataList =

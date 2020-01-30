@@ -14,8 +14,8 @@ data CodecovHaskellArgs = CmdMain
     , excludeDirs   :: [String]
     , testSuites    :: [String]
     , tixFile       :: FilePath
-    , mixDir        :: FilePath
-    , srcDir        :: FilePath
+    , mixDirs       :: [FilePath]
+    , srcDirs       :: [FilePath]
     , displayReport :: Bool
     , printResponse :: Bool
     , dontSend      :: Bool
@@ -47,18 +47,20 @@ codecovHaskellArgs = CmdMain
         &= typFile
         &= name "tix"
         &= help "Path to the .tix file"
-    , mixDir        =
-        defaultMixDir
+    , mixDirs       =
+        [defaultMixDir]
         &= explicit
         &= typDir
         &= name "mix-dir"
-        &= help "Path to the directory containing \".mix\" files"
-    , srcDir =
-        "."
+        &= help "Path to the directory containing \".mix\" files. \
+                \Specify multiple times to pass more than one."
+    , srcDirs =
+        [""]
         &= explicit
         &= typDir
         &= name "src-dir"
-        &= help "Relative directory from project root containing source codes"
+        &= help "Relative directory from project root for source codes. \
+                \Specify multiple times to pass more than one."
     , displayReport =
         False
         &= explicit
@@ -78,7 +80,7 @@ codecovHaskellArgs = CmdMain
         []
         &= typ "TEST-SUITE"
         &= args
-    } &= summary ("codecov-haskell-" ++
+    } &= summary ("codecov-haskell v" ++
                   versionString version ++
                   ", (C) Guillaume Nargeot 2014")
       &= program "codecov-haskell"

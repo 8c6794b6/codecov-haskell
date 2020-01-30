@@ -139,8 +139,8 @@ getConfig cha =
      return Config { Config.excludedDirs = excludeDirs cha
                    , Config.testSuites   = _testSuites
                    , Config.tixDir       = tixFile cha
-                   , Config.mixDir       = mixDir cha
-                   , Config.srcDir       = srcDir cha
+                   , Config.mixDirs      = mixDirs cha
+                   , Config.srcDirs      = srcDirs cha
                    }
 
 printCoverage :: CodecovHaskellArgs -> URLString -> IO ()
