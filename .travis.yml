@@ -8,15 +8,6 @@ cache:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
 
-# addons:
-#   apt:
-#     packages:
-#       - curl
-
-# env:
-#   jobs:
-#     - EXEC="stack" RESOLVER="lts-14"
-
 jobs:
   include:
     - env: EXEC="stack" RESOLVER="lts-14"
@@ -61,10 +52,6 @@ install:
         ;;
     esac
 
-  # - export STACK="stack --resolver=$RESOLVER"
-  # - ${STACK} --version
-  # - ${STACK} test --no-terminal --install-ghc --only-dependencies
-
 script:
   - |
     case "$EXEC" in
@@ -79,18 +66,15 @@ script:
         ;;
     esac
 
-  # - echo stack=$STACK
-  # - $STACK --no-terminal build --fast --test --coverage codecov-haskell
-
 after_script:
   - |
     case "$EXEC" in
       stack)
         echo stack=$STACK
-        STACK_HPC_ROOT=$($STACK path --local-hpc-root)
-        STACK_DIST_DIR=$($STACK path --dist-dir)
-        TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
-        MIX_DIR=$STACK_DIST_DIR/hpc
+        HPC_ROOT=$($STACK path --local-hpc-root)
+        DIST_DIR=$($STACK path --dist-dir)
+        TIX=$HPC_ROOT/codecov-haskell/test-all/test-all.tix
+        MIX_DIR=$DIST_DIR/hpc
         echo TIX=$TIX
         echo MIX_DIR=$MIX_DIR
         $STACK exec -- codecov-haskell \
@@ -106,27 +90,14 @@ after_script:
         VANILLA=$GHCVER_DIR/$CCV_HS/hpc/vanilla
         TIX=$VANILLA/tix/$CCV_HS/$CCV_HS.tix
         MIX_DIR=$VANILLA/mix/$CCV_HS
+        echo TIX=$TIX
+        echo MIX_DIR=$MIX_DIR
         cabal v2-exec -- codecov-haskell \
           --tix=$TIX \
           --mix-dir=$MIX_DIR \
           --display-report \
           test-all
     esac
-
-  # - echo stack=$STACK
-  # - STACK_HPC_ROOT=$($STACK path --local-hpc-root)
-  # - STACK_DIST_DIR=$($STACK path --dist-dir)
-  # - STACK_TIX=$STACK_HPC_ROOT/codecov-haskell/test-all/test-all.tix
-  # - STACK_MIX_DIR=$STACK_DIST_DIR/hpc
-  # - echo STACK_TIX=$STACK_TIX
-  # - echo STACK_MIX_DIR=$STACK_MIX_DIR
-  # - |
-  #   $STACK exec -- \
-  #     codecov-haskell \
-  #       --tix=$STACK_TIX \
-  #       --mix-dir=$STACK_MIX_DIR \
-  #       --display-report \
-  #       test-all
 
 # env:
 #   - GHCVER=7.6.3
