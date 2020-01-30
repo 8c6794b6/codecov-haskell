@@ -18,9 +18,6 @@ import           Trace.Hpc.Codecov.Util
 
 import           CodecovHaskellCmdLine
 
-baseUrlApiV2 :: String
-baseUrlApiV2 = "https://codecov.io/upload/v2"
-
 class QueryParam q where
   qp_service   :: q -> String
   qp_service   = const "unknown"
@@ -68,6 +65,13 @@ data Jenkins = Jenkins
 
 instance QueryParam Jenkins
 
+-- | Compose URL parameters.
+--
+-- See below for detail:
+--
+--   - <https://docs.codecov.io/reference#upload Codecov documentation>
+--   - <https://codecov.io/bash Codecov bash uploader>
+--
 composeParam :: QueryParam ci => ci -> IO String
 composeParam ci =
   do let urlencode = escapeURIString isUnescapedInURIComponent
@@ -89,6 +93,9 @@ composeParam ci =
          z = [("service" ++ '=':qp_service ci)]
      params <- foldM get_val z kvs
      return $ concat (intersperse "&" params)
+
+baseUrlApiV2 :: String
+baseUrlApiV2 = "https://codecov.io/upload/v2"
 
 getUrlApiV2 :: IO String
 getUrlApiV2 =
@@ -122,37 +129,40 @@ getUrlApiV2 =
 --            ("CIRCLECI", ("circleci", "CIRCLE_BUILD_NUM", "CIRCLE_SHA1", "CIRCLE_BRANCH"))]
 
 getUrlWithToken :: String -> String -> Maybe String -> String
-getUrlWithToken apiUrl _ Nothing = apiUrl
-getUrlWithToken apiUrl param (Just t) = apiUrl ++ "&" ++ param ++ "=" ++ t
--- getUrlWithToken apiUrl param mb_val =
---   apiUrl ++ '&':param ++ '=':fromMaybe "" mb_val
+getUrlWithToken apiUrl key =
+  maybe apiUrl (((apiUrl ++ '&':key) ++) . ('=':))
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
-getConfig cha = do _testSuites <- listToMaybe (testSuites cha)
-                   return Config { Config.excludedDirs = excludeDirs cha
-                                 , Config.testSuites   = _testSuites
-                                 , Config.tixDir       = tixFile cha
-                                 , Config.mixDir       = mixDir cha
-                                 , Config.srcDir       = srcDir cha
-                                 }
+getConfig cha =
+  do _testSuites <- listToMaybe (testSuites cha)
+     return Config { Config.excludedDirs = excludeDirs cha
+                   , Config.testSuites   = _testSuites
+                   , Config.tixDir       = tixFile cha
+                   , Config.mixDir       = mixDir cha
+                   , Config.srcDir       = srcDir cha
+                   }
 
 main :: IO ()
 main = do
     cha <- cmdArgs codecovHaskellArgs
     case getConfig cha of
-        Nothing -> putStrLn "Please specify a target test suite name" >> exitSuccess
+        Nothing -> do
+            putStrLn "Please specify a target test suite name"
+            exitSuccess
         Just config -> do
             codecovJson <- generateCodecovFromTix config
-            when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
+            when (displayReport cha) $
+              BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV2
-                putStrLn ("API URL: " ++ apiUrl)
                 let fullUrl = getUrlWithToken apiUrl "token" (token cha)
-                response <- postJson (BSL.unpack $ encode codecovJson) fullUrl (printResponse cha)
+                response <- postJson (BSL.unpack $ encode codecovJson)
+                                     fullUrl (printResponse cha)
                 case response of
                     PostSuccess url _ -> do
                         let responseUrl = getUrlWithToken url "token" (token cha)
                         putStrLn ("URL: " ++ responseUrl)
+
                         -- wait 10 seconds until the page is available
                         threadDelay (10 * 1000000)
                         coverageResult <- readCoverageResult responseUrl (printResponse cha)

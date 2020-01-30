@@ -78,6 +78,8 @@ codecovHaskellArgs = CmdMain
         []
         &= typ "TEST-SUITE"
         &= args
-    } &= summary ("codecov-haskell-" ++ versionString version ++ ", (C) Guillaume Nargeot 2014")
+    } &= summary ("codecov-haskell-" ++
+                  versionString version ++
+                  ", (C) Guillaume Nargeot 2014")
       &= program "codecov-haskell"
     where versionString = intercalate "." . map show . versionBranch

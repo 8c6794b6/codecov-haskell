@@ -39,11 +39,6 @@ postJson :: String        -- ^ json coverage report
          -> IO PostResult -- ^ POST request result
 postJson jsonCoverage url printResponse = do
     h <- initialize
-    -- setopt h (CurlPost True)
-    -- setopt h (CurlVerbose True)
-    -- setopt h (CurlURL url)
-    -- setopt h (CurlHttpHeaders ["Content-Type: application/json"])
-    -- setopt h (CurlPostFields [jsonCoverage])
     setopts h [CurlPost True
               ,CurlVerbose True
               ,CurlURL url
