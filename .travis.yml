@@ -42,12 +42,10 @@ after_script:
   - STACK_MIX_DIR=$STACK_CABAL_VER
   - echo STACK_TIX=$STACK_TIX
   - echo STACK_MIX_DIR=$STACK_MIX_DIR
-  - CODECOV_TOKEN=f70b7e1b-4baf-41c9-af97-901115b93694
   - |
     $STACK exec -- codecov-haskell \
       --tix=$STACK_TIX \
       --mix-dir=$STACK_MIX_DIR \
-      --token=$CODECOV_TOKEN \
       --display-report \
       test-all
 
