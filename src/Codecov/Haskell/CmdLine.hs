@@ -3,10 +3,10 @@
 module Codecov.Haskell.CmdLine where
 
 import Data.List
-import Data.Version            (Version (..))
-import Paths_codecov_haskell   (version)
+import Data.Version             (Version (..))
+import Paths_codecov_haskell    (version)
 import System.Console.CmdArgs
-import Trace.Hpc.Codecov.Paths (defaultMixDir, defaultTixDir)
+import Trace.Hpc.Codecov.Config (defaultMixDir, defaultTixDir)
 
 data CodecovHaskellArgs = CmdMain
     { token         :: Maybe String

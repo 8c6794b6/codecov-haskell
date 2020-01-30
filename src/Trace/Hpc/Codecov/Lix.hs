@@ -30,7 +30,6 @@ data Hit = Full
 
 type Lix = [Hit]
 
-
 toHit :: [Bool] -> Hit
 toHit []  = Irrelevant
 toHit [x] = if x then Full else None

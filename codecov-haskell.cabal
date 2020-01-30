@@ -51,7 +51,6 @@ library
     Trace.Hpc.Codecov.Util
     Paths_codecov_haskell
   other-modules:
-    Trace.Hpc.Codecov.Paths
     Trace.Hpc.Codecov.Curl
   autogen-modules:
     Paths_codecov_haskell
