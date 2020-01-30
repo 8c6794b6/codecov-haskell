@@ -6,6 +6,7 @@ import           Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.List
 import           Data.Maybe                 hiding (listToMaybe)
+import           Network.Curl               (URLString)
 import           Network.URI
 import           System.Console.CmdArgs
 import           System.Environment         (getEnv, getEnvironment)
@@ -142,6 +143,17 @@ getConfig cha =
                    , Config.srcDir       = srcDir cha
                    }
 
+printCoverage :: CodecovHaskellArgs -> URLString -> IO ()
+printCoverage cha url =
+  do let responseUrl = getUrlWithToken url "token" (token cha)
+     putStrLn ("URL: " ++ responseUrl)
+     -- wait 10 seconds until the page is available
+     threadDelay (10 * 1000000)
+     coverageResult <- readCoverageResult responseUrl (printResponse cha)
+     case coverageResult of
+         Just totalCoverage -> putStrLn ("Coverage: " ++ totalCoverage)
+         Nothing            -> putStrLn "Failed to read total coverage"
+
 defaultMain :: IO ()
 defaultMain = do
     cha <- cmdArgs codecovHaskellArgs
@@ -159,14 +171,9 @@ defaultMain = do
                 response <- postJson (BSL.unpack $ encode codecovJson)
                                      fullUrl (printResponse cha)
                 case response of
-                    PostSuccess url _ -> do
-                        let responseUrl = getUrlWithToken url "token" (token cha)
-                        putStrLn ("URL: " ++ responseUrl)
-
-                        -- wait 10 seconds until the page is available
-                        threadDelay (10 * 1000000)
-                        coverageResult <- readCoverageResult responseUrl (printResponse cha)
-                        case coverageResult of
-                            Just totalCoverage -> putStrLn ("Coverage: " ++ totalCoverage) >> exitSuccess
-                            Nothing -> putStrLn "Failed to read total coverage" >> exitSuccess
-                    PostFailure msg -> putStrLn ("Error: " ++ msg) >> exitFailure
+                    PostSuccess _url _ ->
+                      -- XXX: Printing coverage response disabled.
+                      -- printCoverage cha url
+                      putStrLn "Successfully posted coverage report"
+                    PostFailure msg ->
+                      putStrLn ("Error: " ++ msg) >> exitFailure
