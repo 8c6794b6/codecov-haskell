@@ -37,7 +37,7 @@ before_install:
        stack)
          travis_retry curl \
            -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | \
-          tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+           tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
        ;;
        cabal)
          export PATH=/opt/ghc/bin:$PATH
@@ -73,7 +73,8 @@ script:
         $STACK --no-terminal build --fast --test --coverage
         ;;
       cabal)
-        cabal v2-build --enable-tests --enable-coverage
+        cabal v2-configure --enable-tests --enable-coverage
+        cabal v2-build
         cabal v2-test
         ;;
     esac
@@ -98,6 +99,10 @@ after_script:
           --display-report \
           test-all
         ;;
+      cabal)
+        find ./dist-newstyle -name '*.tix'
+        find ./dist-newstyle -name '*.mix'
+        cabal v2-exec -- codecov-haskell --numeric-version
     esac
 
   # - echo stack=$STACK
