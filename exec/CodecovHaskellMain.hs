@@ -6,6 +6,7 @@ import           Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.List
 import           Data.Maybe                 hiding (listToMaybe)
+import           Network.URI
 import           System.Console.CmdArgs
 import           System.Environment         (getEnv, getEnvironment)
 import           System.Exit                (exitFailure, exitSuccess)
@@ -64,17 +65,21 @@ instance QueryParam Jenkins
 composeParam :: QueryParam ci => ci -> IO String
 composeParam ci =
   do let service = qp_service ci
-         get_val acc (g,key) = do
+         get_val acc (g,key,format) = do
            val <- g ci
-           return ((key ++ '=':val) : acc)
-         kvs = [(qp_branch, "branch")
-               ,(qp_build, "build")
-               ,(qp_commit, "commit")
-               ,(qp_job, "job")
-               ,(qp_slug, "slug")
-               ,(qp_env, "env")
-               ,(qp_tag, "tag")
-               ,(qp_pr, "pr")]
+           return ((key ++ '=':format val) : acc)
+         kvs = [(qp_branch, "branch", id)
+               ,(qp_build, "build", id)
+               ,(qp_commit, "commit", id)
+               ,(qp_job, "job", id)
+               ,(qp_slug, "slug", url_encode)
+               ,(qp_env, "env", id)
+               ,(qp_tag, "tag", id)
+               ,(qp_pr, "pr", drop_head_sharp)]
+         url_encode = escapeURIString isUnescapedInURIComponent
+         drop_head_sharp ('#':xs) = xs
+         drop_head_sharp xs       = xs
+
      params <- foldM get_val [("service" ++ '=':service)] kvs
      return $ concat (intersperse "&" params)
 
