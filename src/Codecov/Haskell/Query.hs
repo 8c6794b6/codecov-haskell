@@ -20,7 +20,7 @@ module Codecov.Haskell.Query
 -- base
 import Control.Monad      (foldM)
 import Data.List          (intersperse)
-import System.Environment (getEnv)
+import System.Environment (getEnv, lookupEnv)
 
 -- filepath
 import System.FilePath    (dropExtension, (</>))
@@ -83,7 +83,7 @@ instance QueryParam CircleCI where
                              return (dropExtension url1)
                      else do user <- getEnv "CIRCLE_PROJECT_USERNAME"
                              return (user </> reponame)
-  qp_pr _     = getEnv "CIRCLE_PR_NUMBER"
+  qp_pr _     = getEnvWithDefault "" "CIRCLE_PR_NUMBER"
   qp_commit _ = getEnv "CIRCLE_SHA1"
 
 -- | Data type to represent Jenkins.
@@ -120,3 +120,10 @@ composeParam ci =
          z = [("service" ++ '=':qp_service ci)]
      params <- foldM get_val z kvs
      return $ concat (intersperse "&" params)
+
+-- | Like 'getEnv', but returns given default value when the
+-- environment variable was not found.
+getEnvWithDefault :: String -- ^ Default value.
+                  -> String -- ^ Environment variable name.
+                  -> IO String
+getEnvWithDefault dflt key = maybe dflt id <$> lookupEnv key
