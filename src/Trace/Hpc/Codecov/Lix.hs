@@ -10,12 +10,17 @@
 
 module Trace.Hpc.Codecov.Lix where
 
-import Data.List
-import Data.Ord
+-- base
+import Data.List              (sortBy)
+import Data.Ord               (comparing)
 import Prelude                hiding (getLine)
+
+-- hpc
+import Trace.Hpc.Mix          (BoxLabel (..), CondBox (..), MixEntry)
+import Trace.Hpc.Util         (fromHpcPos)
+
+-- Internal
 import Trace.Hpc.Codecov.Util
-import Trace.Hpc.Mix
-import Trace.Hpc.Util
 
 type CoverageEntry = (
     [MixEntry], -- mix entries

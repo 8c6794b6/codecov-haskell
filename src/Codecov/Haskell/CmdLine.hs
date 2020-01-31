@@ -1,11 +1,26 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+-- |
+-- Module:    Codecov.Haskell.CmdLine
+-- Copyright: (c) 2020 8c6794b6
+--            (c) 2014 Guillaume Nargeot
+-- License:   BSD3
+-- Stability: experimental
+--
+-- Command line argument handling for  @codecov-haskell@ executable.
 
 module Codecov.Haskell.CmdLine where
 
-import Data.List
+-- base
+import Data.List                (intercalate)
 import Data.Version             (Version (..))
+
+-- cmdargs
+import System.Console.CmdArgs   (Data, Typeable, args, explicit, help,
+                                 name, program, summary, typ, typDir,
+                                 typFile, (&=))
+
+-- Internal
 import Paths_codecov_haskell    (version)
-import System.Console.CmdArgs
 import Trace.Hpc.Codecov.Config (defaultMixDir, defaultTixDir)
 
 data CodecovHaskellArgs = CmdMain

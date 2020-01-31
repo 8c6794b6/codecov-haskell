@@ -9,7 +9,8 @@
 
 module Trace.Hpc.Codecov.Config where
 
-import Trace.Hpc.Tix
+-- hpc
+import Trace.Hpc.Tix (TixModule (..), getTixFileName, tixModuleName)
 
 -- | Configuration to find tix, mix and source code files.
 data Config = Config {

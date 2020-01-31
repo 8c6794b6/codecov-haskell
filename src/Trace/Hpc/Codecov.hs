@@ -11,14 +11,21 @@
 
 module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
-import           Control.Exception
-import           Data.Aeson
-import           Data.Aeson.Types         ()
-import           Data.Function
-import           Data.List
-import qualified Data.Map.Strict          as M
+-- base
+import           Data.Function            (on)
+import           Data.List                (foldl', groupBy, zip4)
 import           System.Exit              (exitFailure)
+
+-- aeson
+import           Data.Aeson               (Value (..), object, (.=))
+
+-- containers
+import qualified Data.Map.Strict          as M
+
+-- filepath
 import           System.FilePath          ((</>))
+
+-- Internal
 import           Trace.Hpc.Codecov.Config
 import           Trace.Hpc.Codecov.Lix
 import           Trace.Hpc.Codecov.Util
@@ -43,11 +50,6 @@ type CoverageValue = Value
 type LixConverter = Lix -> SimpleCoverage
 
 defaultConverter :: LixConverter
--- defaultConverter = map $ \lix -> case lix of
---     Full       -> Number 1
---     Partial    -> Bool True
---     None       -> Number 0
---     Irrelevant -> Null
 defaultConverter = M.fromList . snd . foldl' f (1, [])
   where
     f :: (Int, [(Int,Value)]) -> Hit -> (Int, [(Int, Value)])

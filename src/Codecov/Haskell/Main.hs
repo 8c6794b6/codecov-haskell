@@ -1,15 +1,37 @@
-module Codecov.Haskell.Main (defaultMain) where
+-- |
+-- Module:    Codecov.Haskell.Main
+-- Copyright: (c) 2020 8c6794b6
+--            (c) 2014 Guillaume Nargeot
+-- License:   BSD3
+-- Stability: experimental
+--
+-- Main entry point for @codecov-haskell@ executable.
 
-import           Control.Concurrent
-import           Control.Monad
-import           Data.Aeson
-import qualified Data.ByteString.Lazy.Char8 as BSL
-import           Data.List
+module Codecov.Haskell.Main
+    ( defaultMain
+    , printCoverage
+    ) where
+
+-- base
+import           Control.Concurrent         (threadDelay)
+import           Control.Monad              (unless, when)
 import           Data.Maybe                 hiding (listToMaybe)
-import           Network.Curl               (URLString)
-import           System.Console.CmdArgs
 import           System.Environment         (getEnvironment)
 import           System.Exit                (exitFailure)
+
+-- aeson
+import           Data.Aeson                 (encode)
+
+-- cmdargs
+import           System.Console.CmdArgs     (cmdArgs)
+
+-- curl
+import           Network.Curl               (URLString)
+
+-- bytestring
+import qualified Data.ByteString.Lazy.Char8 as BSL
+
+-- Internal
 import           Trace.Hpc.Codecov
 import           Trace.Hpc.Codecov.Config   (Config (Config))
 import qualified Trace.Hpc.Codecov.Config   as Config

@@ -9,7 +9,7 @@
 
 module Trace.Hpc.Codecov.Util where
 
-import Data.List
+import Data.List (isPrefixOf)
 
 fst3 :: (a, b, c) -> a
 fst3 (x, _, _) = x
@@ -36,7 +36,7 @@ matchAny patterns fileName = any (`isPrefixOf` fileName) patterns
 mapFirst :: (a -> a) -> [a] -> [a]
 mapFirst f (x : xs) = f x : xs
 mapFirst _ []       = []
- 
+
 mapLast :: (a -> a) -> [a] -> [a]
 mapLast f [x]      = [f x]
 mapLast f (x : xs) = x : mapLast f xs

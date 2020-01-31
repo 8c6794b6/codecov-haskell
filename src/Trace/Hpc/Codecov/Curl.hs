@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
-
 -- |
 -- Module:      Trace.Hpc.Codecov.Curl
 -- Copyright:   (c) 2014 Guillaume Nargeot
@@ -10,17 +9,33 @@
 --
 -- Functions for sending coverage report files over http.
 
-module Trace.Hpc.Codecov.Curl ( postJson, readCoverageResult, PostResult (..) ) where
+module Trace.Hpc.Codecov.Curl
+   ( postJson
+   , readCoverageResult
+   , PostResult (..)
+   ) where
 
-import           Control.Applicative
+-- base
 import           Control.Monad
-import           Control.Retry
-import           Data.Aeson
-import           Data.Aeson.Types (parseMaybe)
+import           Data.Maybe                 (fromJust, isNothing)
+
+-- aeson
+import           Data.Aeson                 (decode, (.:))
+import           Data.Aeson.Types           (parseMaybe)
+
+-- bytestring
 import qualified Data.ByteString.Lazy.Char8 as LBS
-import           Data.Maybe
-import           Data.Monoid
-import           Network.Curl
+
+-- curl
+import           Network.Curl               (CurlCode (..),
+                                             CurlOption (..), CurlResponse,
+                                             CurlResponse_ (..), URLString,
+                                             curlGetString, initialize,
+                                             perform_with_response_,
+                                             setopts)
+
+-- retry
+import           Control.Retry
 
 -- | Result to the POST request to codecov.io
 data PostResult =
@@ -28,13 +43,14 @@ data PostResult =
   | PostFailure String              -- ^ error message
 
 parseResponse :: CurlResponse -> PostResult
-parseResponse r = case respCurlCode r of
+parseResponse r =
+  case respCurlCode r of
     CurlOK -> PostSuccess (getField "url") (getField "wait_url")
     _      -> PostFailure $ getField "message"
-    where getField fieldName = fromJust $ mGetField fieldName
-          mGetField fieldName = do
-              result <- decode $ LBS.pack (respBody r)
-              parseMaybe (.: fieldName) result
+  where getField fieldName = fromJust $ mGetField fieldName
+        mGetField fieldName = do
+            result <- decode $ LBS.pack (respBody r)
+            parseMaybe (.: fieldName) result
 
 -- | Send json coverage report over HTTP using POST request
 postJson :: String        -- ^ json coverage report
@@ -64,9 +80,10 @@ performWithRetry action = retrying expRetryPolicy isNothingM action'
 
 extractCoverage :: String -> Maybe String
 extractCoverage rBody = (++ "%") . show <$> (getField "coverage" :: Maybe Integer)
-    where getField fieldName = do
-              result <- decode $ LBS.pack rBody
-              parseMaybe (.: fieldName) result
+    where
+      getField fieldName = do
+         result <- decode $ LBS.pack rBody
+         parseMaybe (.: fieldName) result
 
 -- | Read the coveraege result page from coveralls.io
 readCoverageResult :: URLString         -- ^ target url
@@ -74,14 +91,15 @@ readCoverageResult :: URLString         -- ^ target url
                    -> IO (Maybe String) -- ^ coverage result
 readCoverageResult url printResponse =
     performWithRetry readAction
-    where readAction = do
-          response <- curlGetString url curlOptions
-          when printResponse $ putStrLn $ snd response
-          return $ case response of
-              (CurlOK, body) -> extractCoverage body
-              _ -> Nothing
-          where curlOptions = [
-                    CurlTimeout 60,
-                    CurlConnectTimeout 60,
-                    CurlVerbose True,
-                    CurlFollowLocation True]
+    where
+        readAction = do
+           response <- curlGetString url curlOptions
+           when printResponse $ putStrLn $ snd response
+           return $ case response of
+               (CurlOK, body) -> extractCoverage body
+               _              -> Nothing
+        curlOptions = [
+            CurlTimeout 60,
+            CurlConnectTimeout 60,
+            CurlVerbose True,
+            CurlFollowLocation True]
