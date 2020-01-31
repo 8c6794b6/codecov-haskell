@@ -22,6 +22,9 @@ import Control.Monad      (foldM)
 import Data.List          (intersperse)
 import System.Environment (getEnv)
 
+-- filepath
+import System.FilePath    (dropExtension, (</>))
+
 -- network-uri
 import Network.URI        (escapeURIString, isUnescapedInURIComponent)
 
@@ -51,6 +54,7 @@ class QueryParam q where
   qp_pr        :: q -> IO String
   qp_pr        = const (return "")
 
+-- | Data type to represent Travis CI.
 data Travis = Travis
 
 instance QueryParam Travis where
@@ -64,11 +68,25 @@ instance QueryParam Travis where
   qp_tag _     = getEnv "TRAVIS_TAG"
   qp_pr _      = getEnv "TRAVIS_PULL_REQUEST"
 
+-- | Data type to represent CircleCI.
 data CircleCI = CircleCI
 
 instance QueryParam CircleCI where
-  qp_service = const "circleci"
+  qp_service  = const "circleci"
+  qp_branch _ = getEnv "CIRCLE_BRANCH"
+  qp_build _  = getEnv "CIRCLE_BUILD_NUM"
+  qp_job _    = getEnv "CIRCLE_NODE_INDEX"
+  qp_slug _   = do reponame <- getEnv "CIRCLE_PROJECT_REPONAME"
+                   if null reponame
+                     then do url0 <- getEnv "CIRCLE_REPOSITORY_URL"
+                             let url1 = dropWhile (== ':') url0
+                             return (dropExtension url1)
+                     else do user <- getEnv "CIRCLE_PROJECT_USERNAME"
+                             return (user </> reponame)
+  qp_pr _     = getEnv "CIRCLE_PR_NUMBER"
+  qp_commit _ = getEnv "CIRCLE_SHA1"
 
+-- | Data type to represent Jenkins.
 data Jenkins = Jenkins
 
 instance QueryParam Jenkins where
