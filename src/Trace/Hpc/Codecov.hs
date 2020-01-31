@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-
 -- |
 -- Module:      Trace.Hpc.Codecov
--- Copyright:   (c) 2014 Guillaume Nargeot
+-- Copyright:   (c) 2020 8c6794b6
+--              (c) 2014 Guillaume Nargeot
 -- License:     BSD3
 -- Maintainer:  Guillaume Nargeot <guillaume+hackage@nargeot.com>
 -- Stability:   experimental

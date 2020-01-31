@@ -2,7 +2,8 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 -- |
 -- Module:      Trace.Hpc.Codecov.Curl
--- Copyright:   (c) 2014 Guillaume Nargeot
+-- Copyright:   (c) 2020 8c6794b6
+--              (c) 2014 Guillaume Nargeot
 -- License:     BSD3
 -- Maintainer:  Guillaume Nargeot <guillaume+hackage@nargeot.com>
 -- Stability:   experimental
