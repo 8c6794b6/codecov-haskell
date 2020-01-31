@@ -45,6 +45,7 @@ library
   exposed-modules:
     Codecov.Haskell.CmdLine
     Codecov.Haskell.Main
+    Codecov.Haskell.Query
     Trace.Hpc.Codecov
     Trace.Hpc.Codecov.Config
     Trace.Hpc.Codecov.Lix

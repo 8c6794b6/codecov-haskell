@@ -47,7 +47,7 @@ codecovHaskellArgs = CmdMain
         &= explicit
         &= typDir
         &= name "exclude-dir"
-        &= help "Exclude sources files under the matching directory from the coverage report"
+        &= help "Exclude sources files under the matching directory"
     , tixFile        =
         defaultTixDir
         &= explicit
@@ -72,7 +72,7 @@ codecovHaskellArgs = CmdMain
         False
         &= explicit
         &= name "display-report"
-        &= help "Display the json code coverage report that will be sent to codecov.io"
+        &= help "Display the generated code coverage JSON"
     , printResponse =
         False
         &= explicit

@@ -7,9 +7,8 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.List
 import           Data.Maybe                 hiding (listToMaybe)
 import           Network.Curl               (URLString)
-import           Network.URI
 import           System.Console.CmdArgs
-import           System.Environment         (getEnv, getEnvironment)
+import           System.Environment         (getEnvironment)
 import           System.Exit                (exitFailure)
 import           Trace.Hpc.Codecov
 import           Trace.Hpc.Codecov.Config   (Config (Config))
@@ -18,82 +17,7 @@ import           Trace.Hpc.Codecov.Curl
 import           Trace.Hpc.Codecov.Util
 
 import           Codecov.Haskell.CmdLine
-
-class QueryParam q where
-  qp_service   :: q -> String
-  qp_service   = const "unknown"
-  qp_branch    :: q -> IO String
-  qp_branch    = const (return "")
-  qp_build     :: q -> IO String
-  qp_build     = const (return "")
-  qp_build_url :: q -> IO String
-  qp_build_url = const (return "")
-  qp_commit    :: q -> IO String
-  qp_commit    = const (return "")
-  qp_flags     :: q -> IO String
-  qp_flags     = const (return "")
-  qp_job       :: q -> IO String
-  qp_job       = const (return "")
-  qp_name      :: q -> IO String
-  qp_name      = const (return "")
-  qp_slug      :: q -> IO String
-  qp_slug      = const (return "")
-  qp_env       :: q -> IO String
-  qp_env       = const (return "")
-  qp_tag       :: q -> IO String
-  qp_tag       = const (return "")
-  qp_pr        :: q -> IO String
-  qp_pr        = const (return "")
-
-data Travis = Travis
-
-instance QueryParam Travis where
-  qp_service _ = "travis"
-  qp_branch _  = getEnv "TRAVIS_BRANCH"
-  qp_build _   = getEnv "TRAVIS_JOB_NUMBER"
-  qp_commit _  = getEnv "TRAVIS_COMMIT"
-  qp_job _     = getEnv "TRAVIS_JOB_ID"
-  qp_slug _    = getEnv "TRAVIS_REPO_SLUG"
-  qp_env _     = getEnv "TRAVIS_OS_NAME"
-  qp_tag _     = getEnv "TRAVIS_TAG"
-  qp_pr _      = getEnv "TRAVIS_PULL_REQUEST"
-
-data CircleCI = CircleCI
-
-instance QueryParam CircleCI
-
-data Jenkins = Jenkins
-
-instance QueryParam Jenkins
-
--- | Compose URL parameters.
---
--- See below for detail:
---
---   - <https://docs.codecov.io/reference#upload Codecov documentation>
---   - <https://codecov.io/bash Codecov bash uploader>
---
-composeParam :: QueryParam ci => ci -> IO String
-composeParam ci =
-  do let urlencode = escapeURIString isUnescapedInURIComponent
-         drop_head_sharps = dropWhile (== '#')
-         get_val acc (key,g,format) = do
-           val <- g ci
-           return ((key ++ '=':format val) : acc)
-         kvs = [("branch", qp_branch, id)
-               ,("build", qp_build, id)
-               ,("build_url", qp_build_url,  id)
-               ,("commit", qp_commit, id)
-               ,("flags", qp_flags, id)
-               ,("name", qp_name, urlencode)
-               ,("job", qp_job, id)
-               ,("slug", qp_slug, urlencode)
-               ,("env", qp_env, id)
-               ,("tag", qp_tag, id)
-               ,("pr", qp_pr, drop_head_sharps)]
-         z = [("service" ++ '=':qp_service ci)]
-     params <- foldM get_val z kvs
-     return $ concat (intersperse "&" params)
+import           Codecov.Haskell.Query
 
 baseUrlApiV2 :: String
 baseUrlApiV2 = "https://codecov.io/upload/v2"
