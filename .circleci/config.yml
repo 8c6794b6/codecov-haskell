@@ -20,6 +20,7 @@ jobs:
       - run:
           name: Show version information
           command: |
+            set +e
             which stack
             stack --version
             stack exec -- which ghc
