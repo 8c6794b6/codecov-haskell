@@ -15,14 +15,14 @@ jobs:
           keys:
             - codecov-haskell-{{ checksum "codecov-haskell.cabal" }}
       - run:
-          - name: Resolve/update dependencies
-          - command: stack setup
+          name: Resolve/update dependencies
+          command: stack setup
       - run:
-          - name: Run tests
-          - command: stack build --fast --test --coverage
+          name: Run tests
+          command: stack build --fast --test --coverage
       - run:
-          - name: Install executable
-          - command: stack build --copy-bins
+          name: Install executable
+          command: stack build --copy-bins
       - save_cache:
           name: Cache Dependencies
           key: codecov-haskell-{{ checksum "codecov-haskell.cabal" }}
