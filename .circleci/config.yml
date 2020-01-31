@@ -20,7 +20,6 @@ jobs:
       - run:
           name: Show version information
           command: |
-            set +e
             which stack
             stack --version
             stack exec -- which ghc
@@ -28,6 +27,17 @@ jobs:
       - run:
           name: Run tests
           command: stack build --no-terminal --fast --test --coverage
+      - run:
+          name: Upload coverage
+          command: |
+            HPC_ROOT=$(stack path --local-hpc-root)
+            DIST_DIR=$(stack path --dist-dir)
+            TIX=$HPC_ROOT/codecov-haskell/test-all/test-all.tix
+            MIX_DIR=$DIST_DIR/hpc
+            echo TIX=$TIX
+            echo MIX_DIR=$MIX_DIR
+            stack exec -- codecov-haskell --tix=$TIX \
+              --mix-dir=$MIX_DIR --display-report test-all
       - run:
           name: Install executable
           command: stack build --no-terminal --copy-bins
