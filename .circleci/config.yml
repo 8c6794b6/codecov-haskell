@@ -18,7 +18,7 @@ jobs:
           name: Resolve/update dependencies
           command: stack setup
       - run:
-          name: Show version info
+          name: Show version information
           command: |
             which stack
             stack --version
