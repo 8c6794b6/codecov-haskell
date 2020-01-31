@@ -3,6 +3,7 @@ codecov-haskell
 
 [![Build
 Status](http://img.shields.io/travis/8c6794b6/codecov-haskell/master.svg?logo=travis)](https://travis-ci.org/8c6794b6/codecov-haskell)
+![CircleCI](https://img.shields.io/circleci/build/gh/8c6794b6/codecov-haskell/master?logo=circleci)
 [![codecov](https://codecov.io/gh/8c6794b6/codecov-haskell/branch/master/graph/badge.svg)](https://codecov.io/gh/8c6794b6/codecov-haskell)
 [![BSD3
 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29)
@@ -12,9 +13,9 @@ Hackage](http://img.shields.io/hackage/v/codecov-haskell.svg)](http://hackage.ha
 codecov-haskell converts and sends Haskell projects hpc code coverage
 to [codecov.io](http://codecov.io/).
 
-At the moment, [Travis CI](https://travis-ci.org) has been tested, but
-codecov-haskell should be compatible with other CI services in the
-future.
+At the moment, [Travis CI](https://travis-ci.org) and [Circle
+CI](https://circleci.com) has been tested, but codecov-haskell should
+be compatible with other CI services in the future.
 
 <!-- At the moment, [Travis CI](https://travis-ci.org), [Circle -->
 <!-- CI](https://circleci.com) and [Jenkins CI](https://jenkins-ci.org) -->
@@ -32,9 +33,7 @@ Below is a sample configuration for a project `.travis.yml` using
 
 ```yaml
 language: c
-
 os: linux
-
 git:
   depth: 3
 
