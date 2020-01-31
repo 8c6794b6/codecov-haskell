@@ -18,11 +18,18 @@ jobs:
           name: Resolve/update dependencies
           command: stack setup
       - run:
+          name: Show version info
+          command: |
+            which stack
+            stack --version
+            stack exec -- which ghc
+            stack exec -- ghc --version
+      - run:
           name: Run tests
-          command: stack build --fast --test --coverage
+          command: stack build --no-terminal --fast --test --coverage
       - run:
           name: Install executable
-          command: stack build --copy-bins
+          command: stack build --no-terminal --copy-bins
       - save_cache:
           name: Cache Dependencies
           key: codecov-haskell-{{ checksum "codecov-haskell.cabal" }}
